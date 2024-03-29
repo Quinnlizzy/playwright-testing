@@ -7,5 +7,6 @@ async function basketTest() {
     const browser = await playwright.chromium.launch({ headless: false });
     //create new page
     const page = await browser.newPage();
+    //navigate to Huel website
     await page.goto('https://huel.com/');
   }
