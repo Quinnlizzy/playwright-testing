@@ -14,6 +14,7 @@ test('completePurchaseFlow', async ({ page }) => {
     await page.getByRole('button', { name: 'Spicy Indian Curry Increase' }).click();
     await page.getByRole('button', { name: 'Spicy Indian Curry Increase' }).click();
     await page.getByRole('button', { name: 'Continue' }).click();
+    await page.waitForURL('https://huel.com/products/build-your-own-bundle?mrasn=1158041.1435750.TFBCdNT7#/step-2');
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByTestId('IconLink-Search').click();
     await page.getByTestId('SearchBar__input').fill('huel complete nutrition bar');
