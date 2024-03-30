@@ -1,6 +1,6 @@
 // playwright.config.js
 module.exports = {
-    use: {
-      headless: false,
-    },
-  };
+  use: {
+    headless: false,
+  },
+};

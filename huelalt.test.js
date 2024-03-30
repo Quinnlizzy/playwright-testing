@@ -1,22 +1,41 @@
 import { test, expect } from '@playwright/test';
 
 test('completePurchaseFlow', async ({ page }) => {
-    try {
+        
+    
+        const searchIcon = await page.getByTestId('IconLink-Search');
+        const searchBarInput = await page.getByTestId('SearchBar__input');
+        const searchInput1 = 'huel instant meals';
+    
         await page.goto('https://huel.com/');
-        const url = page.url();
-        expect(url).toBe('https://huel.com/');
-        await page.getByTestId('acceptCookieButton').click();
-            let errorOccurred = false;
-            try {
-                await page.getByTestId('cookieBanner');
-            } catch (error) {
-                errorOccurred = true;
-            }
-            expect(errorOccurred).toBeTruthy();
-        await page.getByTestId('IconLink-Search').click();
+        expect(page.url()).toBe('https://huel.com/');
+
+        const acceptCookieButton = await page.$('[data-testid="acceptCookieButton"]');
+        if (acceptCookieButton) {
+            await acceptCookieButton.click();
+            await page.waitForTimeout(1000); // wait for the animation to complete
+            const isCookieButtonVisible = await page.isVisible('[data-testid="acceptCookieButton"]');
+            expect(isCookieButtonVisible).toBe(false);
+        }
+
+        await searchIcon.click();
+        expect(await searchBarInput.isVisible()).toBe(true);
+        expect(await searchBarInput.isEnabled()).toBe(true);
+        
         await page.getByTestId('SearchBar__input').click();
-        await page.getByTestId('SearchBar__input').fill('huel instant meals');
+        const focusedElement = await page.evaluate(() => document.activeElement.getAttribute('data-testid'));
+        expect(focusedElement).toBe('SearchBar__input');
+
+        await page.getByTestId('SearchBar__input').fill(searchInput1);
+        const searchBarInputValue = await searchBarInput.inputValue();
+        expect(searchBarInputValue).toBe('huel instant meals');
+
         await page.getByTestId('SearchBar__input').press('Enter');
+        await page.waitForURL();
+        const searchWords = ['search', ...searchInput1.split(' ')];
+        const expectedUrlPart = 'search?q=' + encodeURIComponent(searchInput1);
+        expect(page.url()).toContain(expectedUrlPart);
+
         await page.getByRole('link', { name: 'Huel Instant Meals', exact: true }).click();
         await page.getByRole('button', { name: 'Mexican Chili Increase' }).click();
         await page.getByRole('button', { name: 'Mexican Chili Increase' }).click();
@@ -47,10 +66,14 @@ test('completePurchaseFlow', async ({ page }) => {
         await page.locator('span').filter({ hasText: '.st0{fill:none;stroke:#0B0B0B;stroke-width:20;stroke-miterlimit:10;} Men\'s' }).locator('#Layer_1').click();
         await page.getByRole('button', { name: 'Add Free T-shirt' }).click();
         await page.getByRole('button', { name: 'Secure Checkout' }).click();
-} catch (error) {
-    console.error(`Test failed with error: ${error}`);
-}
+// } catch (error) {
+//     console.error(`Test failed with error: ${error}`);
+// }
 });
+
+
+
+
 
 // test('test', async ({ page }) => {
 //     //navigate to Huel website
