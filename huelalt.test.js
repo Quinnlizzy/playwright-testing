@@ -12,13 +12,13 @@ test('test', async ({ page }) => {
     await page.getByRole('button', { name: 'Mexican Chili Increase' }).click();
     await page.getByRole('button', { name: 'Spicy Indian Curry Increase' }).click();
     await page.getByRole('button', { name: 'Spicy Indian Curry Increase' }).click();
-
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByTestId('IconLink-Search').click();
     await page.getByTestId('SearchBar__input').fill('huel complete nutrition bar');
     //await page.getByTestId('SearchBar__submit-button').click(); //fails on icon click?
     await page.getByTestId('SearchBar__input').press('Enter');
+    await page.waitForTimeout(2000); // Wait for 2 seconds - couldnt get past this step without a timeout?
     await page.getByRole('link', { name: 'Huel Complete Nutrition Bar', exact: true }).click();
     await page.getByRole('button', { name: 'Chocolate Fudge Brownie' }).click();
     await page.getByRole('button', { name: 'Chocolate Fudge Brownie Increase Quantity' }).click();
