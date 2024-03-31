@@ -1,20 +1,25 @@
 import { test, expect } from '@playwright/test';
 
 test('completePurchaseFlow', async ({ page }) => {
-        const acceptCookieButton = await page.$('[data-testid="acceptCookieButton"]');
+
         const searchIcon = await page.getByTestId('IconLink-Search');
         const searchBarInput = await page.getByTestId('SearchBar__input');
         const searchInput1 = 'Huel Instant Meals';
-    
+        
+        async function acceptCookiesIfPresent(page) {
+            const acceptCookieButton = await page.getByTestId('acceptCookieButton');
+            if (acceptCookieButton && await acceptCookieButton.isVisible()) {
+                await acceptCookieButton.click();
+                await page.waitForTimeout(1000); // wait for the animation to complete
+                const isCookieButtonVisible = await page.isVisible('[data-testid="acceptCookieButton"]');
+                expect(isCookieButtonVisible).toBe(false);
+            }
+        }
+
+
         await page.goto('https://huel.com/');
         expect(page.url()).toBe('https://huel.com/');
-        
-        if (acceptCookieButton) {
-            await acceptCookieButton.click();
-            await page.waitForTimeout(1000); // wait for the animation to complete
-            const isCookieButtonVisible = await page.isVisible('[data-testid="acceptCookieButton"]');
-            expect(isCookieButtonVisible).toBe(false);
-        }
+        await acceptCookiesIfPresent(page);
 
         await searchIcon.click();
         expect(await searchBarInput.isVisible()).toBe(true);
@@ -32,6 +37,7 @@ test('completePurchaseFlow', async ({ page }) => {
         await page.waitForURL();
         const expectedUrlPart = 'search?q=' + encodeURIComponent(searchInput1);
         expect(page.url()).toContain(expectedUrlPart);
+        await acceptCookiesIfPresent(page);
 
         //await page.getByRole('link', { name: 'Huel Instant Meals', exact: true }).click();
         // await page.waitForSelector(`a:has-text("${searchInput1}")`);
@@ -48,6 +54,8 @@ test('completePurchaseFlow', async ({ page }) => {
         await searchSelectionLink.click();
         await page.waitForLoadState('networkidle');
         expect(page.url()).toContain('https://huel.com/products/build-your-own-bundle');
+        
+        await acceptCookiesIfPresent(page);
 
         await page.getByRole('button', { name: 'Mexican Chili Increase' }).click();
         await page.getByRole('button', { name: 'Mexican Chili Increase' }).click();
