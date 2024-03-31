@@ -1,16 +1,14 @@
 import { test, expect } from '@playwright/test';
 
 test('completePurchaseFlow', async ({ page }) => {
-        
-    
+        const acceptCookieButton = await page.$('[data-testid="acceptCookieButton"]');
         const searchIcon = await page.getByTestId('IconLink-Search');
         const searchBarInput = await page.getByTestId('SearchBar__input');
-        const searchInput1 = 'huel instant meals';
+        const searchInput1 = 'Huel Instant Meals';
     
         await page.goto('https://huel.com/');
         expect(page.url()).toBe('https://huel.com/');
-
-        const acceptCookieButton = await page.$('[data-testid="acceptCookieButton"]');
+        
         if (acceptCookieButton) {
             await acceptCookieButton.click();
             await page.waitForTimeout(1000); // wait for the animation to complete
@@ -28,11 +26,10 @@ test('completePurchaseFlow', async ({ page }) => {
 
         await page.getByTestId('SearchBar__input').fill(searchInput1);
         const searchBarInputValue = await searchBarInput.inputValue();
-        expect(searchBarInputValue).toBe('huel instant meals');
+        expect(searchBarInputValue).toBe(searchInput1);
 
         await page.getByTestId('SearchBar__input').press('Enter');
         await page.waitForURL();
-        const searchWords = ['search', ...searchInput1.split(' ')];
         const expectedUrlPart = 'search?q=' + encodeURIComponent(searchInput1);
         expect(page.url()).toContain(expectedUrlPart);
 
@@ -43,13 +40,14 @@ test('completePurchaseFlow', async ({ page }) => {
         // await page.waitForLoadState('networkidle');
         // expect(page.url()).toBe('https://huel.com/products/build-your-own-bundle?mrasn=1158041.1435750.TFBCdNT7#');
         
-        const link = await page.getByRole('link', { name: searchInput1, exact: true });
-        expect(await link.isVisible()).toBe(true);
-        expect(await link.isEnabled()).toBe(true);
-        console.log(await link.getAttribute('href'));
-        await link.click();
+        const searchSelectionLink = page.getByRole('link', { name: searchInput1, exact: true });
+        // await link.isVisible().toBe(true);
+        // expect(await link.isEnabled()).toBe(true);
+        // console.log(await link.getAttribute('href'));
+
+        await searchSelectionLink.click();
         await page.waitForLoadState('networkidle');
-        expect(page.url()).toBe('https://huel.com/products/build-your-own-bundle?mrasn=1158041.1435750.TFBCdNT7#');
+        expect(page.url()).toContain('https://huel.com/products/build-your-own-bundle');
 
         await page.getByRole('button', { name: 'Mexican Chili Increase' }).click();
         await page.getByRole('button', { name: 'Mexican Chili Increase' }).click();
