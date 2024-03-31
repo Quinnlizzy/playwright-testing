@@ -36,10 +36,21 @@ test('completePurchaseFlow', async ({ page }) => {
         const expectedUrlPart = 'search?q=' + encodeURIComponent(searchInput1);
         expect(page.url()).toContain(expectedUrlPart);
 
-        await page.getByRole('link', { name: searchInput1, exact: true }).click();
+        //await page.getByRole('link', { name: 'Huel Instant Meals', exact: true }).click();
+        // await page.waitForSelector(`a:has-text("${searchInput1}")`);
+        // expect (page.getByRole('link', { name: searchInput1, exact: true }).isVisible());
+        // await page.getByRole('link', { name: searchInput1, exact: true }).click();
+        // await page.waitForLoadState('networkidle');
+        // expect(page.url()).toBe('https://huel.com/products/build-your-own-bundle?mrasn=1158041.1435750.TFBCdNT7#');
+        
+        const link = await page.getByRole('link', { name: searchInput1, exact: true });
+        expect(await link.isVisible()).toBe(true);
+        expect(await link.isEnabled()).toBe(true);
+        console.log(await link.getAttribute('href'));
+        await link.click();
         await page.waitForLoadState('networkidle');
         expect(page.url()).toBe('https://huel.com/products/build-your-own-bundle?mrasn=1158041.1435750.TFBCdNT7#');
-        
+
         await page.getByRole('button', { name: 'Mexican Chili Increase' }).click();
         await page.getByRole('button', { name: 'Mexican Chili Increase' }).click();
         await page.getByRole('button', { name: 'Spicy Indian Curry Increase' }).click();
