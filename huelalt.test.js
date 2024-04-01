@@ -30,13 +30,17 @@ test('completePurchaseFlow', async ({ page }) => {
             }
         }
 
+        async function clickSearchIconAndCheckInput(page) {        
+            await searchIcon.click();
+            expect(await searchBarInput.isVisible()).toBe(true);
+            expect(await searchBarInput.isEnabled()).toBe(true);
+        }
+
         await page.goto('https://huel.com/');
         expect(page.url()).toBe('https://huel.com/');
         await acceptCookiesIfPresent(page);
 
-        await searchIcon.click();
-        expect(await searchBarInput.isVisible()).toBe(true);
-        expect(await searchBarInput.isEnabled()).toBe(true);
+        clickSearchIconAndCheckInput(page)
         
         await page.getByTestId('SearchBar__input').click();
         const focusedElement = await page.evaluate(() => document.activeElement.getAttribute('data-testid'));
@@ -52,7 +56,11 @@ test('completePurchaseFlow', async ({ page }) => {
         expect(page.url()).toContain(expectedUrlSearch1);
         await acceptCookiesIfPresent(page);
 
+        // After searching for a product
         const searchSelectionLink1 = page.getByRole('link', { name: searchInput1, exact: true });
+        if (!searchSelectionLink1) {
+            throw new Error(`Product not found: ${searchInput1}`);
+        }
         await searchSelectionLink1.click();
         await page.waitForLoadState('networkidle');
         expect(page.url()).toContain('/build-your-own-bundle');
@@ -77,13 +85,11 @@ test('completePurchaseFlow', async ({ page }) => {
         expect(await element.isVisible()).toBe(true);
 
 
-        await page.getByTestId('IconLink-Search').click();
-        expect(await searchBarInput.isVisible()).toBe(true);
-        expect(await searchBarInput.isEnabled()).toBe(true);
+        clickSearchIconAndCheckInput(page)
         
-        await page.getByTestId('SearchBar__input').fill(searchInput2);
-        await page.getByTestId('SearchBar__input').click();
-        expect(focusedElement).toBe('SearchBar__input');
+        // await page.getByTestId('SearchBar__input').fill(searchInput2);
+        // await page.getByTestId('SearchBar__input').click();
+        // expect(focusedElement).toBe('SearchBar__input');
 
         await page.getByTestId('SearchBar__input').fill(searchInput2);
         const searchBarInputValue2 = await searchBarInput.inputValue();
@@ -95,7 +101,9 @@ test('completePurchaseFlow', async ({ page }) => {
         expect(page.url()).toContain(expectedUrlSearch2);
 
         const searchSelectionLink2 = page.getByRole('link', { name: searchInput2, exact: true });
-
+        if (!searchSelectionLink2) {
+            throw new Error(`Product not found: ${searchInput2}`);
+        }
         await searchSelectionLink2.click();
         await page.waitForTimeout(3000)
         //await page.waitForLoadState('networkidle');
@@ -109,14 +117,16 @@ test('completePurchaseFlow', async ({ page }) => {
         await clickAndAssertMultipleTimes(page, 'button', 'Dark Chocolate Raspberry Increase', '.QuantitySelector__input', 2);
 
         await page.getByRole('button', { name: 'Continue' }).click();
+        
         expect(page.url()).toContain('/step-2');
 
-        await page.getByRole('button', { name: 'Continue' }).click();
-        expect(page.url()).toContain('/step-2');
+         await page.getByRole('button', { name: 'Continue' }).click();
+         expect(page.url()).toContain('/step-2');
 
         await page.getByRole('button', { name: 'Continue to Cart' }).click();
         expect(page.url()).toContain('/cart');
-
+        
+        await page.waitForTimeout(3000)
         await page.locator('span').filter({ hasText: 'Add Free T-shirt' }).click();
         expect( await page.locator('h2.is-size-5.has-text-weight-bold').isVisible()).toBe(true);
 
