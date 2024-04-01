@@ -5,6 +5,7 @@ test('completePurchaseFlow', async ({ page }) => {
         const searchIcon = await page.getByTestId('IconLink-Search');
         const searchBarInput = await page.getByTestId('SearchBar__input');
         const searchInput1 = 'Huel Instant Meals';
+        const searchInput2 = 'Huel Complete Nutrition Bar';
 
         async function acceptCookiesIfPresent(page) {
             const acceptCookieButton = await page.getByTestId('acceptCookieButton');
@@ -21,6 +22,13 @@ test('completePurchaseFlow', async ({ page }) => {
             await button.click();
         }
 
+        async function clickAndAssertMultipleTimes(page, role, name, selector, times) {
+            for (let i = 0; i < times; i++) {
+                await clickAndAssert(page, role, name);
+                await page.waitForTimeout(500); // wait for the UI to update
+                expect(await page.inputValue(selector)).toBe((i + 1).toString());
+            }
+        }
 
         await page.goto('https://huel.com/');
         expect(page.url()).toBe('https://huel.com/');
@@ -35,13 +43,13 @@ test('completePurchaseFlow', async ({ page }) => {
         expect(focusedElement).toBe('SearchBar__input');
 
         await page.getByTestId('SearchBar__input').fill(searchInput1);
-        const searchBarInputValue = await searchBarInput.inputValue();
-        expect(searchBarInputValue).toBe(searchInput1);
+        const searchBarInputValue1 = await searchBarInput.inputValue();
+        expect(searchBarInputValue1).toBe(searchInput1);
 
         await page.getByTestId('SearchBar__input').press('Enter');
         await page.waitForURL();
-        const expectedUrlPart = 'search?q=' + encodeURIComponent(searchInput1);
-        expect(page.url()).toContain(expectedUrlPart);
+        const expectedUrlSearch1 = 'search?q=' + encodeURIComponent(searchInput1);
+        expect(page.url()).toContain(expectedUrlSearch1);
         await acceptCookiesIfPresent(page);
 
         //await page.getByRole('link', { name: 'Huel Instant Meals', exact: true }).click();
@@ -51,36 +59,68 @@ test('completePurchaseFlow', async ({ page }) => {
         // await page.waitForLoadState('networkidle');
         // expect(page.url()).toBe('https://huel.com/products/build-your-own-bundle?mrasn=1158041.1435750.TFBCdNT7#');
         
-        const searchSelectionLink = page.getByRole('link', { name: searchInput1, exact: true });
+        const searchSelectionLink1 = page.getByRole('link', { name: searchInput1, exact: true });
         // await link.isVisible().toBe(true);
         // expect(await link.isEnabled()).toBe(true);
         // console.log(await link.getAttribute('href'));
 
-        await searchSelectionLink.click();
+        await searchSelectionLink1.click();
         await page.waitForLoadState('networkidle');
-        expect(page.url()).toContain('https://huel.com/products/build-your-own-bundle');
+        expect(page.url()).toContain('/build-your-own-bundle');
         
         await acceptCookiesIfPresent(page);
 
-        await clickAndAssert(page, 'button', 'Mexican Chili Increase');
-        const quantityInputMexChil = await page.getByRole('spinbutton', { name: 'Mexican Chilli Quantity' });
-        expect(await quantityInputMexChil.value()).toBe('1');
-        await clickAndAssert(page, 'button', 'Mexican Chili Increase');
-        expect(await quantityInputMexChil.value()).toBe('2');
-        await clickAndAssert(page, 'button', 'Spicy Indian Curry Increase');
-        await clickAndAssert(page, 'button', 'Spicy Indian Curry Increase');
+        await clickAndAssertMultipleTimes(page, 'button', 'Spicy Indian Curry Increase', '.QuantitySelector__input', 2);
+        await clickAndAssertMultipleTimes(page, 'button', 'Mexican Chili Increase', '.QuantitySelector__input', 2);
+
         await page.getByRole('button', { name: 'Continue' }).click();
-        //await page.waitForURL('https://huel.com/products/build-your-own-bundle?mrasn=1158041.1435750.TFBCdNT7#/step-2');
-        //worked better without
+        expect(page.url()).toContain('/step-2');
+                
         await page.getByRole('button', { name: 'Continue' }).click();
+        expect(page.url()).toContain('/step-2');
+
+        // await page.getByRole('button', { name: 'Continue' }).click();
+        // expect(page.url()).toContain('/cross-sell');
+
+        
         await page.getByRole('button', { name: 'Continue to Cart' }).click();
+        await page.waitForTimeout(3000); // wait for 3 seconds
+        expect(page.url()).toContain('/cart');
+
+        const element = await page.getByText('Huel Instant Meals');
+        expect(await element.isVisible()).toBe(true);
+        await page.waitForTimeout(3000); // wait for 3 seconds
+
+
+
+
+
         await page.getByTestId('IconLink-Search').click();
-        await page.getByTestId('SearchBar__input').fill('huel complete nutrition bar');
-        //await page.getByTestId('SearchBar__submit-button').click(); //fails on icon click?
-        await page.waitForTimeout(2000);
+        expect(await searchBarInput.isVisible()).toBe(true);
+        expect(await searchBarInput.isEnabled()).toBe(true);
+        
+        await page.getByTestId('SearchBar__input').fill(searchInput2);
+        await page.getByTestId('SearchBar__input').click();
+        expect(focusedElement).toBe('SearchBar__input');
+
+        await page.getByTestId('SearchBar__input').fill(searchInput2);
+        const searchBarInputValue2 = await searchBarInput.inputValue();
+        expect(searchBarInputValue2).toBe(searchInput2);
+
         await page.getByTestId('SearchBar__input').press('Enter');
-        await page.waitForTimeout(2000); // Wait for 2 seconds - couldnt get past this step without a timeout?
-        await page.getByRole('link', { name: 'Huel Complete Nutrition Bar', exact: true }).click();
+        await page.waitForURL();
+        const expectedUrlSearch2 = 'search?q=' + encodeURIComponent(searchInput2);
+        expect(page.url()).toContain(expectedUrlSearch2);
+
+        const searchSelectionLink2 = page.getByRole('link', { name: searchInput2, exact: true });
+
+        await searchSelectionLink2.click();
+        await page.waitForLoadState('networkidle');
+        expect(page.url()).toContain('/build-your-own-bundle');
+        
+      
+        await acceptCookiesIfPresent(page);
+
         await page.getByRole('button', { name: 'Chocolate Fudge Brownie' }).click();
         await page.getByRole('button', { name: 'Chocolate Fudge Brownie Increase Quantity' }).click();
         await page.getByRole('button', { name: 'Chocolate Caramel Increase' }).click();
@@ -99,45 +139,3 @@ test('completePurchaseFlow', async ({ page }) => {
 // }
 });
 
-
-
-
-
-// test('test', async ({ page }) => {
-//     //navigate to Huel website
-//     await page.goto('https://huel.com/');
-//     await page.click('[data-testid="IconLink-Search"]');
-//     await page.fill('[data-testid="SearchBar__input"]', 'huel instant meals');
-//     await page.press('[data-testid="SearchBar__input"]', 'Enter');
-//     await page.waitForSelector('a[href="/products/huel-hot-savoury?_pos=3&_sid=7586e1ea0&_ss=r"]', { state: 'visible'});
-//     await page.click('a[href="/products/huel-hot-savoury?_pos=3&_sid=7586e1ea0&_ss=r"]');
-//     await page.click('[role="button"][name="Mexican Chili Increase"]');
-//     await page.click('[role="button"][name="Mexican Chili Increase"]');
-//     await page.click('[role="button"][name="Yellow Coconut Curry Increase"]');
-//     await page.click('[role="button"][name="Yellow Coconut Curry Increase"]');
-//     await page.click('[role="button"][name="Chick\'n & Mushroom Pasta"]');
-//     await page.click('[role="button"][name="Continue"]');
-//     await page.click('[role="button"][name="Continue"]');
-//     await page.click('[role="button"][name="Continue To Cart"]');
-//     await page.click('[data-testid="IconLink-Search"]');
-//     await page.click('[data-testid="SearchBar__input"]');
-//     await page.fill('[data-testid="SearchBar__input"]', 'huel complete nutrition bar');
-//     await page.press('[data-testid="SearchBar__input"]', 'Enter');
-//     await page.click('[role="link"][name="Huel Complete Nutrition Bar"]');
-//     await page.click('[role="button"][name="Dark Chocolate Raspberry"]');
-//     await page.click('[role="button"][name="Chocolate Caramel Increase"]');
-//     await page.click('[role="button"][name="Chocolate Fudge Brownie"]');
-//     await page.click('[role="button"][name="Continue"]');
-//     await page.click('[role="button"][name="Continue"]');
-//     await page.click('[role="button"][name="Continue To Cart"]');
-//     await page.click('[role="button"][name="Edit"]');
-//     await page.click('[role="button"][name="Dark Chocolate Raspberry Increase Quantity"]');
-//     await page.click('[role="button"][name="Continue"]');
-//     await page.click('[role="button"][name="Continue"]');
-//     await page.click('[role="button"][name="Continue To Cart"]');
-//     await page.click('span:has-text("Add Free T-shirt")');
-//     await page.click('text=XL');
-//     await page.click('.tshirt-modal__black-square');
-//     await page.click('text=Men\'s');
-//     await page.click('[role="button"][name="Add Free T-shirt"]');
-// });
