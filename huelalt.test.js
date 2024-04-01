@@ -25,7 +25,7 @@ test('completePurchaseFlow', async ({ page }) => {
         async function clickAndAssertMultipleTimes(page, role, name, selector, times) {
             for (let i = 0; i < times; i++) {
                 await clickAndAssert(page, role, name);
-                await page.waitForTimeout(500); // wait for the UI to update
+                //await page.waitForTimeout(500); // wait for the UI to update
                 expect(await page.inputValue(selector)).toBe((i + 1).toString());
             }
         }
@@ -52,18 +52,7 @@ test('completePurchaseFlow', async ({ page }) => {
         expect(page.url()).toContain(expectedUrlSearch1);
         await acceptCookiesIfPresent(page);
 
-        //await page.getByRole('link', { name: 'Huel Instant Meals', exact: true }).click();
-        // await page.waitForSelector(`a:has-text("${searchInput1}")`);
-        // expect (page.getByRole('link', { name: searchInput1, exact: true }).isVisible());
-        // await page.getByRole('link', { name: searchInput1, exact: true }).click();
-        // await page.waitForLoadState('networkidle');
-        // expect(page.url()).toBe('https://huel.com/products/build-your-own-bundle?mrasn=1158041.1435750.TFBCdNT7#');
-        
         const searchSelectionLink1 = page.getByRole('link', { name: searchInput1, exact: true });
-        // await link.isVisible().toBe(true);
-        // expect(await link.isEnabled()).toBe(true);
-        // console.log(await link.getAttribute('href'));
-
         await searchSelectionLink1.click();
         await page.waitForLoadState('networkidle');
         expect(page.url()).toContain('/build-your-own-bundle');
@@ -77,22 +66,15 @@ test('completePurchaseFlow', async ({ page }) => {
         expect(page.url()).toContain('/step-2');
                 
         await page.getByRole('button', { name: 'Continue' }).click();
-        expect(page.url()).toContain('/step-2');
-
-        // await page.getByRole('button', { name: 'Continue' }).click();
-        // expect(page.url()).toContain('/cross-sell');
+        expect(page.url()).toContain('/step-2'); // expect(page.url()).toContain('/cross-sell'); - doesnt appear in headerless version?
 
         
         await page.getByRole('button', { name: 'Continue to Cart' }).click();
-        await page.waitForTimeout(3000); // wait for 3 seconds
+        await page.waitForTimeout(3000);
         expect(page.url()).toContain('/cart');
 
         const element = await page.getByText('Huel Instant Meals');
         expect(await element.isVisible()).toBe(true);
-        await page.waitForTimeout(3000); // wait for 3 seconds
-
-
-
 
 
         await page.getByTestId('IconLink-Search').click();
@@ -115,20 +97,28 @@ test('completePurchaseFlow', async ({ page }) => {
         const searchSelectionLink2 = page.getByRole('link', { name: searchInput2, exact: true });
 
         await searchSelectionLink2.click();
-        await page.waitForLoadState('networkidle');
-        expect(page.url()).toContain('/build-your-own-bundle');
+        await page.waitForTimeout(3000)
+        //await page.waitForLoadState('networkidle');
+        expect(page.url()).toContain('huel-bar');
+        await page.waitForTimeout(3000)
         
       
         await acceptCookiesIfPresent(page);
+        await clickAndAssertMultipleTimes(page, 'button', 'Chocolate Fudge Brownie Increase', '.QuantitySelector__input', 1);
+        await clickAndAssertMultipleTimes(page, 'button', 'Chocolate Caramel Increase', '.QuantitySelector__input', 1);
+        await clickAndAssertMultipleTimes(page, 'button', 'Dark Chocolate Raspberry Increase', '.QuantitySelector__input', 2);
 
-        await page.getByRole('button', { name: 'Chocolate Fudge Brownie' }).click();
-        await page.getByRole('button', { name: 'Chocolate Fudge Brownie Increase Quantity' }).click();
-        await page.getByRole('button', { name: 'Chocolate Caramel Increase' }).click();
-        await page.getByRole('button', { name: 'Chocolate Caramel Increase' }).click();
-        await page.getByRole('button', { name: 'Dark Chocolate Raspberry' }).click();
         await page.getByRole('button', { name: 'Continue' }).click();
+        expect(page.url()).toContain('/step-2');
+
+        await page.getByRole('button', { name: 'Continue' }).click();
+        expect(page.url()).toContain('/step-2');
+
         await page.getByTestId('IconLink-Cart').click();
+        await page.waitForTimeout(3000)
+
         await page.locator('span').filter({ hasText: 'Add Free T-shirt' }).click();
+        await page.waitForTimeout(3000)
         await page.getByText('XL', { exact: true }).click();
         await page.locator('.tshirt-modal__black-square').click();
         await page.locator('span').filter({ hasText: '.st0{fill:none;stroke:#0B0B0B;stroke-width:20;stroke-miterlimit:10;} Men\'s' }).locator('#Layer_1').click();
