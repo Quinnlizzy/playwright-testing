@@ -140,6 +140,10 @@ test('completePurchaseFlow', async ({ page }) => {
         expect(page.url()).toContain('/cart');
         const yourBundleHeader = page.locator('h3:has-text("Your Bundle")');
         expect(await yourBundleHeader.isVisible()).toBe(true);
+
+        const itemCountSpan = await page.locator('span.item_count');
+        const itemCount = parseInt(await itemCountSpan.innerText(), 10);
+        expect(itemCount).toBeGreaterThanOrEqual(2);
                 
         await page.getByRole('button', { name: 'Secure Checkout' }).click();
         //cease test here as it requires legit details to continue
