@@ -5,7 +5,7 @@ test('completePurchaseFlow', async ({ page }) => {
         const searchIcon = await page.getByTestId('IconLink-Search');
         const searchBarInput = await page.getByTestId('SearchBar__input');
         const searchInput1 = 'Huel Instant Meals';
-        
+
         async function acceptCookiesIfPresent(page) {
             const acceptCookieButton = await page.getByTestId('acceptCookieButton');
             if (acceptCookieButton && await acceptCookieButton.isVisible()) {
@@ -14,6 +14,11 @@ test('completePurchaseFlow', async ({ page }) => {
                 const isCookieButtonVisible = await page.isVisible('[data-testid="acceptCookieButton"]');
                 expect(isCookieButtonVisible).toBe(false);
             }
+        }
+
+        async function clickAndAssert(page, role, name) {
+            const button = await page.getByRole(role, { name: name });
+            await button.click();
         }
 
 
@@ -57,10 +62,13 @@ test('completePurchaseFlow', async ({ page }) => {
         
         await acceptCookiesIfPresent(page);
 
-        await page.getByRole('button', { name: 'Mexican Chili Increase' }).click();
-        await page.getByRole('button', { name: 'Mexican Chili Increase' }).click();
-        await page.getByRole('button', { name: 'Spicy Indian Curry Increase' }).click();
-        await page.getByRole('button', { name: 'Spicy Indian Curry Increase' }).click();
+        await clickAndAssert(page, 'button', 'Mexican Chili Increase');
+        const quantityInputMexChil = await page.getByRole('spinbutton', { name: 'Mexican Chilli Quantity' });
+        expect(await quantityInputMexChil.value()).toBe('1');
+        await clickAndAssert(page, 'button', 'Mexican Chili Increase');
+        expect(await quantityInputMexChil.value()).toBe('2');
+        await clickAndAssert(page, 'button', 'Spicy Indian Curry Increase');
+        await clickAndAssert(page, 'button', 'Spicy Indian Curry Increase');
         await page.getByRole('button', { name: 'Continue' }).click();
         //await page.waitForURL('https://huel.com/products/build-your-own-bundle?mrasn=1158041.1435750.TFBCdNT7#/step-2');
         //worked better without
