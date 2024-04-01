@@ -100,7 +100,7 @@ test('completePurchaseFlow', async ({ page }) => {
         await page.waitForTimeout(3000)
         //await page.waitForLoadState('networkidle');
         expect(page.url()).toContain('huel-bar');
-        await page.waitForTimeout(3000)
+        //await page.waitForTimeout(3000)
         
       
         await acceptCookiesIfPresent(page);
@@ -114,18 +114,35 @@ test('completePurchaseFlow', async ({ page }) => {
         await page.getByRole('button', { name: 'Continue' }).click();
         expect(page.url()).toContain('/step-2');
 
-        await page.getByTestId('IconLink-Cart').click();
-        await page.waitForTimeout(3000)
+        await page.getByRole('button', { name: 'Continue to Cart' }).click();
+        expect(page.url()).toContain('/cart');
 
         await page.locator('span').filter({ hasText: 'Add Free T-shirt' }).click();
-        await page.waitForTimeout(3000)
+        expect( await page.locator('h2.is-size-5.has-text-weight-bold').isVisible()).toBe(true);
+
         await page.getByText('XL', { exact: true }).click();
+        const xlButton = await page.locator('span.tshirt__size-button[data-size="XL"]');
+        const xlStyleConfirm = await xlButton.getAttribute('style');
+        expect(xlStyleConfirm).toContain('border: 1px solid rgb(11, 11, 11)');
+
         await page.locator('.tshirt-modal__black-square').click();
+        const colorButton = await page.locator('span.tshirt__size-button[data-colour="Black"]');
+        const colourStyleConfirm = await colorButton.getAttribute('style');
+        expect(colourStyleConfirm).toContain('border: 1px solid rgb(11, 11, 11)');
+
         await page.locator('span').filter({ hasText: '.st0{fill:none;stroke:#0B0B0B;stroke-width:20;stroke-miterlimit:10;} Men\'s' }).locator('#Layer_1').click();
+        const genderStyleButton = await page.locator('span.tshirt-modal__icon[data-gender="Men\'s"]');
+        const genderStyleConfirm = await genderStyleButton.getAttribute('style');
+        expect(genderStyleConfirm).toContain('border: 1px solid rgb(11, 11, 11)');
+
+
         await page.getByRole('button', { name: 'Add Free T-shirt' }).click();
+        expect(page.url()).toContain('/cart');
+        const yourBundleHeader = page.locator('h3:has-text("Your Bundle")');
+        expect(await yourBundleHeader.isVisible()).toBe(true);
+                
         await page.getByRole('button', { name: 'Secure Checkout' }).click();
-// } catch (error) {
-//     console.error(`Test failed with error: ${error}`);
-// }
-});
+        //cease test here as it requires legit details to continue
+    }
+);
 
