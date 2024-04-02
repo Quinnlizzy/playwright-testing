@@ -271,16 +271,26 @@ test('completePurchaseFlow', async ({ page }) => {
         //This was the most common place for the cookies bar to appear if not the home page
         await acceptCookiesIfPresent(page);
 
+        // Click the 'Increase' button for 'Spicy Indian Curry' twice and check that the quantity is correct
+        // and then the same for Mexican Chili
+        // It would have been better to save the values here as variables back at the top
         await clickAndAssertMultipleTimes(page, 'button', 'Spicy Indian Curry Increase', '.QuantitySelector__input', 2);
         await clickAndAssertMultipleTimes(page, 'button', 'Mexican Chili Increase', '.QuantitySelector__input', 2);
 
+
+        // Click on the button with the name 'Continue' and check if the URL of the page contains '/step-2'.
         await page.getByRole('button', { name: 'Continue' }).click();
         expect(page.url()).toContain('/step-2');
-                
+        // Same again - i couldn't quite figure out this behaviour and i'm not sure if it was something to do
+        // with this being the headerless version but on the live site it takes you to the
+        // follow up /cross-sell page however that failed each time and when i used timeouts to slow things down and see what was happening
+        // the URL remained step-2 even after the click was confirmed. No cross sell page appeared.     
         await page.getByRole('button', { name: 'Continue' }).click();
-        expect(page.url()).toContain('/step-2'); // expect(page.url()).toContain('/cross-sell'); - doesnt appear in headerless version?
+        expect(page.url()).toContain('/step-2'); 
 
         
+        // Click on the button with the name 'Continue to Cart', wait for 3 seconds, and check if the URL of the page contains '/cart'.
+        // Get the text 'Huel Instant Meals' from the page and check if it is visible.
         await page.getByRole('button', { name: 'Continue to Cart' }).click();
         await page.waitForTimeout(3000);
         expect(page.url()).toContain('/cart');
