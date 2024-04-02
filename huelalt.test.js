@@ -171,10 +171,9 @@ import { test, expect } from '@playwright/test';
 test('completePurchaseFlow', async ({ page }) => {
 
     // Define constants for search inputs to make it possible to amend them for better reusability
-    // these two choices were sleected as they both involved building bundles therefore there was 
-    // more functionality on the page made available to test
     const searchInput1 = 'Huel Instant Meals';
     const searchInput2 = 'Huel Complete Nutrition Bar';
+    const searchBarInput = page.getByTestId('SearchBar__input');
 
 
     // Define a function to accept cookies if the button is present
