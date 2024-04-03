@@ -38,10 +38,9 @@ test('completePurchaseFlow', async ({ page }) => {
     }
 
 
-    // UNUSED FUNCTION 
-    // this was supposed to define a function to click a button multiple times and assert it was clicked each time
-    // i was unable to get it to work as it seemed to have trouble differentiating between the different value-input-selectors
-    // and different methods i used to try and find the relevant one didnt work so this one will have to go back to the drawing board
+    // this defines the function to click a button multiple times and assert it was clicked each time
+    // i differentiating between the different value-input-selectors
+    // but managed to narrow it down to this 
     async function clickAndAssertMultipleTimes(page, role, name, selector, times) {
         // Click the button the specified number of times
         for (let i = 0; i < times; i++) {
