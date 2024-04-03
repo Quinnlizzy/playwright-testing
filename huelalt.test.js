@@ -121,7 +121,7 @@ test('completePurchaseFlow', async ({ page }) => {
         }
         await searchSelectionLink1.click();
         await page.waitForLoadState('networkidle');
-        expect(page.url()).toContain('/hot-and-savoury'); // this also worked with /hot-and-savoury which in hindsight is the more specific option
+        expect(page.url()).toContain('huel-hot-savoury'); // this was originally '/build-you-own-bundle' but tdecided it wasn't specific enough
         
         
         //This was the most common place for the cookies bar to appear if not the home page
