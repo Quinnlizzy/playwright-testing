@@ -182,7 +182,7 @@ test('completePurchaseFlow', async ({ page }) => {
         await continueToCart(page);
         
         // this was needed to give the t-shirt modal time to load - again the wait for selector wasn't working here as i would have expected it to
-        await page.waitForTimeout(3000)
+        //await page.waitForTimeout(3000)
 
 
         // this just handled all the t-shirt option-select logic

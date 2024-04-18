@@ -1,6 +1,16 @@
 // playwright.config.js
-module.exports = {
-  use: {
-    headless: false,
-  },
-};
+
+// playwright.config.ts
+import { defineConfig } from '@playwright/test';
+
+// export default defineConfig({
+//   globalTimeout: 60000,
+// });
+
+// module.exports = {
+//   use: {
+//     headless: false,
+//   },
+// Timeout: 60000,
+// };
+
