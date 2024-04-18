@@ -3,7 +3,7 @@
 // playwright.config.ts
 import { defineConfig } from '@playwright/test';
 
-// export default defineConfig({
+ export default defineConfig({
 //   globalTimeout: 60000,
 // });
 
