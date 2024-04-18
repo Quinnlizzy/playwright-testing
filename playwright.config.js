@@ -10,7 +10,7 @@ import { defineConfig } from '@playwright/test';
  module.exports = {
    use: {
      headless: false,
-//   },
+   },
 // Timeout: 60000,
 // };
 
