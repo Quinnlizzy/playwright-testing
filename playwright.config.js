@@ -11,6 +11,6 @@ import { defineConfig } from '@playwright/test';
    use: {
      headless: false,
    },
-// Timeout: 60000,
+ Timeout: 60000,
 // };
 
